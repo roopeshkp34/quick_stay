@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 
+from app.router import api
+
 
 app = FastAPI()
+
+app.include_router(api.router, prefix="/api")
 
 @app.get("/")
 async def index() -> str:
