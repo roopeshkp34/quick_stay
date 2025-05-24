@@ -23,7 +23,7 @@ const BookIcon = () => (
   </svg>
 );
 
-const Navbar = async () => {
+const Navbar = () => {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Hotels", path: "/rooms" },
