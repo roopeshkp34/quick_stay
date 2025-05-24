@@ -1,11 +1,26 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { roomsDummyData } from "../assets/assets"
 import HotelCard from "./HotelCard"
 import Title from "./Title"
 import { useNavigate } from "react-router-dom"
+import axios from "axios"
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 const FeaturedDestination = () => {
     const navigate = useNavigate()
+    const [rooms, setRooms] = useState([])
+
+    useEffect(() => {
+        axios.get(`${BASE_URL}/api/room`)
+            .then(response => {
+                setRooms(response.data)
+            }).catch(error => {
+                alert(error)
+            })
+
+    }, [])
+
     return (
         <div className="flex flex-col items-center px-6 md:px-16 lg:px-24 bg-slate-50 py-20">
             <Title title="Featured Destination" subTitle="Discover our handpicked selection of exceptional properties around the world, offering unparalleled luxury and unforgettable experience. " />
