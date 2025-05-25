@@ -2,7 +2,13 @@ from fastapi import HTTPException, Security, status
 from typing import Dict, Optional
 
 from app.core.security import verify_token
+from app.db import users
 
+def get_user_from_sub(sub: str) -> Optional[Dict]:
+    for user in users:
+        if user.get("sub") == sub:
+            return user
+    return None
 
 def get_optional_user(
     payload: Optional[Dict] = Security(verify_token),
@@ -19,7 +25,19 @@ def get_optional_user(
     
     if payload is None:
         return None
-    return payload
+    sub = payload.get("sub")
+    if not sub:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
+    user = get_user_from_sub(sub=sub)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    return user
 
 
 def get_current_user(payload: Dict = Security(verify_token)) -> Dict:
@@ -40,4 +58,16 @@ def get_current_user(payload: Dict = Security(verify_token)) -> Dict:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Requires Authentication."
         )
-    return payload
+    sub = payload.get("sub")
+    if not sub:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
+    user = get_user_from_sub(sub=sub)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    return user

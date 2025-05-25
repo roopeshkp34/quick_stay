@@ -4,14 +4,13 @@ import HotelCard from "./HotelCard"
 import Title from "./Title"
 import { useNavigate } from "react-router-dom"
 import axios, { all } from "axios"
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL
+import { BASE_URL } from "../utils/constants"
 
 const FeaturedDestination = () => {
     const navigate = useNavigate()
     const [rooms, setRooms] = useState([])
 
-    const { userId, sessionId, getToken, isLoaded, isSignedIn } = useAuth();
+    const { getToken } = useAuth();
  
     useEffect(() => {
         const fetchData = async () => {

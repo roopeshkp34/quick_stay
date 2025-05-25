@@ -1,0 +1,1 @@
+from app.db.db import users, hotels, rooms # noqa: F401

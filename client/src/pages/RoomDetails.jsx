@@ -1,24 +1,41 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { assets, facilityIcons, roomCommonData, roomsDummyData } from "../assets/assets";
 import StarRating from "../components/StarRating";
+import { BASE_URL } from "../utils/constants"
+import { useAuth } from "@clerk/clerk-react";
+import axios from "axios";
+
 
 const RoomDetails = () => {
     const { id } = useParams()
     const [room, setRoom] = useState(null)
     const [mainImage, setMainImage] = useState(null)
+    const { getToken } = useAuth();
 
     useEffect(() => {
-        const room = roomsDummyData.find(room => room._id === id)
-        room && setRoom(room)
-        room && setMainImage(room.images[0])
+        const fetchRoomDetails = async () => {
+            try {
+                const token = await getToken();
+                const response = await axios.get(`${BASE_URL}/api/room/${id}`, {
+                    headers: {
+                        Authorization: token ? `Bearer ${token}` : ""
+                    }
+                });
+                setRoom(response.data)
+                setMainImage(`/${response.data.images[0]}`)
+            } catch (error) {
+                alert(error)
+            }
+        }   
+        fetchRoomDetails()
     }, [])
 
     return room && (
         <div className="py-28 md:py-35 px-4 md:px-16 lg:px-24 xl:px-32">
             {/* Room Details */}
             <div className="flex flex-col md:flex-row items-start md:items-center gap-2">
-                <h1 className="text-3xl md:text-4xl font-playfair">{room.hotel.name} <span className="font-inner text-sm">({room.roomType})</span></h1>
+                <h1 className="text-3xl md:text-4xl font-playfair">{room.hotel.name} <span className="font-inner text-sm">({room.room_type})</span></h1>
                 <p className="text-xs font-inter py-1.5 px-3 text-white bg-orange-500 rounded-full">20% off</p>
             </div>
 
@@ -41,7 +58,7 @@ const RoomDetails = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4 lg:w-1/2 w-full">
                     {room?.images.length > 1 && room.images.map((image, index) => (
-                        <img src={image} alt="Room Image" key={index} onClick={() => setMainImage(image)} className={`w-full rounded-xl shadow-md object-cover cursor-pointer ${mainImage == image && "outline-3 outline-orange-500"}`} />
+                        <img src={`/${image}`} alt="Room Image" key={index} onClick={() => setMainImage(`/${image}`)} className={`w-full rounded-xl shadow-md object-cover cursor-pointer ${mainImage == `/${image}` && "outline-3 outline-orange-500"}`} />
                     ))}
                 </div>
             </div>
@@ -60,10 +77,10 @@ const RoomDetails = () => {
                     </div>
                 </div>
                 {/* Room Price */}
-                <p className="tex-2xl font-medium">${room.pricePerNight}/night</p>
+                <p className="tex-2xl font-medium">${room.price_per_night}/night</p>
             </div>
 
-            {/* Checkin Checkout form */}
+            {/* Check in Checkout form */}
             <form className="flex flex-col md:flex-row items-start md:items-center justify-between bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.15)] p-6 rounded-xl mx-auto mt-16 max-w-6xl">
                 <div className="flex flex-col flex-wrap md:flex-row items-start md:items-center gap-4 md:gap-10 text-gray-500">
                     <div className="flex flex-col">
