@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react"
-import { roomsDummyData } from "../assets/assets"
+import { useAuth } from "@clerk/clerk-react";
 import HotelCard from "./HotelCard"
 import Title from "./Title"
 import { useNavigate } from "react-router-dom"
-import axios from "axios"
+import axios, { all } from "axios"
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
@@ -11,14 +11,25 @@ const FeaturedDestination = () => {
     const navigate = useNavigate()
     const [rooms, setRooms] = useState([])
 
+    const { userId, sessionId, getToken, isLoaded, isSignedIn } = useAuth();
+ 
     useEffect(() => {
-        axios.get(`${BASE_URL}/api/room`)
-            .then(response => {
-                setRooms(response.data)
-            }).catch(error => {
-                alert(error)
-            })
+        const fetchData = async () => {
+        try {
+            const token = await getToken();
 
+            const response = await axios.get(`${BASE_URL}/api/room`, {
+                headers: {
+                    Authorization: token ? `Bearer ${token}` : "",
+                },
+            });
+
+            setRooms(response.data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+        fetchData();
     }, [])
 
     return (

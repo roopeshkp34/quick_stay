@@ -1,5 +1,8 @@
 
-from fastapi import APIRouter
+from typing import Dict, Optional
+from fastapi import APIRouter, Depends
+
+from app.router import dependency
 
 router = APIRouter(prefix="/room")
 
@@ -42,7 +45,7 @@ hotel_dummy_data = {
 }
 
 @router.get("")
-async def get_rooms():
+async def get_rooms(user: Optional[Dict] = Depends(dependency.get_optional_user)):
     return [
     {
         "id": "67f7647c197ac559e4089b96",

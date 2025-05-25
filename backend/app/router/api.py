@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.router import room
+from app.router.endpoints import room
 
 router = APIRouter()
 
